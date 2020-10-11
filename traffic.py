@@ -63,7 +63,7 @@ def load_data(data_dir):
     images = []
     labels = []
 
-    for num in range(0, 43):
+    for num in range(len(os.listdir(gtsrb_dir_path))):
         labels.append(num)
         sign_dir_path = os.path.join(gtsrb_dir_path, str(num))
         current_sign_images = []
@@ -75,15 +75,14 @@ def load_data(data_dir):
                 dsize=(IMG_WIDTH, IMG_HEIGHT)
             )
             current_sign_images.append(image)
-            print(image.shape)
-
+            print(type(image))
         images.append(current_sign_images)
 
     return(images, labels)
 
         
 
-    raise NotImplementedError
+    
 
 
 def get_model():
@@ -92,8 +91,20 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    raise NotImplementedError
+    # create the convolutional neural network model
+    model = tf.keras.models.Sequential()
+    # add a convolution layer
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)))
+    # add an output layer
+    model.add(tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax"))
 
+    model.compile(
+        optimizer="adam",
+        loss="categorical_crossentropy",
+        metrics=["accuracy"]
+    )
+
+    return model
 
 if __name__ == "__main__":
     main()
