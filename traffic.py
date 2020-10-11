@@ -64,9 +64,7 @@ def load_data(data_dir):
     labels = []
 
     for num in range(len(os.listdir(gtsrb_dir_path))):
-        labels.append(num)
         sign_dir_path = os.path.join(gtsrb_dir_path, str(num))
-        current_sign_images = []
 
         for filename in os.listdir(sign_dir_path):
             image = cv2.imread(os.path.join(sign_dir_path, filename))
@@ -74,10 +72,10 @@ def load_data(data_dir):
                 src=image,
                 dsize=(IMG_WIDTH, IMG_HEIGHT)
             )
-            current_sign_images.append(image)
-            print(type(image))
-        images.append(current_sign_images)
-
+            labels.append(num)
+            images.append(image)
+        
+    
     return(images, labels)
 
         
@@ -93,11 +91,18 @@ def get_model():
     """
     # create the convolutional neural network model
     model = tf.keras.models.Sequential()
-    # add a convolution layer
-    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)))
+    # add a convolutional layer
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)))
+
+    model.add(tf.keras.layers.MaxPooling2D(3,3))
+    model.add(tf.keras.layers.Dropout(0.2))
+    
+    # flatten
+    model.add(tf.keras.layers.Flatten())
     # add an output layer
     model.add(tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax"))
 
+    model.summary()
     model.compile(
         optimizer="adam",
         loss="categorical_crossentropy",
